@@ -8,18 +8,28 @@ class OwnsListView(View):
         own=Owners.objects.all()
         
         result = []
-        for carname in own:
-            result.append(carname.name)
+        for owner in own:
+            doglist=[ ]
+            dog =Dogs.objects.all()
+            for dogss in dog:
+                doginfo ={'dogname':dogss.name,'dogage':dogss.age}
+                doglist.append(doginfo)
+            last_list ={
+                'name': owner.name,
+                'age' : owner.age,
+                'email':owner.email,
+                'dogifo':doglist
+            }
         
-        return JsonResponse({'result':result},status=200) #{'message':'Succes!'}  바디
-
+            result.append(last_list)
+        return JsonResponse({'result':result},status=200) #{'message':'Succes!'} 바디
 
     def post(self,request):#프론트엔드 에서 받아온 정보를 까봐야한다. 제이슨바디에 담아서 보내준다.
         data =json.loads(request.body)
-        Owners.objects.create(name=data['name'],age=['age'],email=data['email'])
-         
-        return JsonResponse({'message':'SUCCESS!'},status=201) #{'message':'Succes!'}  바디
+        
+        Owners.objects.create(name=data['name'],age=data['age'],email=data['email'])
 
+        return JsonResponse({'message':'SUCCESS!'},status=200) #{'message':'Succes!'}  바디
 
 class DogsListView(View):
     def get(self,requset):
@@ -28,7 +38,11 @@ class DogsListView(View):
     
         result = []
         for dogsname in dog:
-             result.append(dogsname.name)
+            my_dog = {'name':dogsname.name,
+            'age':dogsname.age, 
+            'owner':dogsname.owners.name}
+            result.append(my_dog)
+             #result.append(dogsname.name)
         return JsonResponse({'result':result},status=200)
         
     def post(self,request):#프론트엔드 에서 받아온 정보를 까봐야한다. 제이슨바디에 담아서 보내준다.
@@ -36,12 +50,3 @@ class DogsListView(View):
         sk = Owners.objects.get(name=data['owners'])
         Dogs.objects.create(name=data['name'],age=data['age'], owners=sk)
         return JsonResponse({'message':'SUCCESS!'},status=200) #{'message':'Succes!'}  바디
-
-
-
-
-
-
-
-
-        
